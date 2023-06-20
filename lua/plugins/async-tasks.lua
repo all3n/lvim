@@ -10,9 +10,3 @@ vim.g.asyncrun_open = 10
 vim.g.asynctasks_extra_config = {
     task_file,
 }
--- vim.api.nvim_set_keymap("", "<F5>", ":AsyncTask file-build<CR>", { noremap = true, silent = false })
--- vim.api.nvim_set_keymap("", "<F6>", ":AsyncTask file-run<CR>", { noremap = true, silent = false })
--- vim.api.nvim_set_keymap("", "<F7>", ":AsyncTask project-build<CR>", { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("", "<F8>", ":AsyncTask project-run<CR>", { noremap = true, silent = true })
-
-
