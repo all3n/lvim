@@ -10,7 +10,9 @@ export EXEC_LIST=()
 exec_dir(){
   find_exec $1
   EXEC_NUM=${#EXEC_LIST[@]}
-  if [[ $EXEC_NUM -eq 1 ]];then
+  if [[ $EXEC_NUM -eq 0 ]];then
+    echo "NOT FOUND EXECUTABLE FILE"
+  elif [[ $EXEC_NUM -eq 1 ]];then
     echo "BIN:$EXEC_LIST"
     echo "------------------------------------------------"
     $EXEC_LIST
@@ -31,7 +33,13 @@ exec_dir(){
 if [[ -f $ROOT/CMakeLists.txt ]];then
   exec_dir $ROOT/build
 elif [[ -f $ROOT/Makefile ]] || [[ -f $ROOT/makefile ]];then
-  exec_dir $ROOT
+  make
+  BUILD_DIR=$ROOT/build
+  if [[ -d $BUILD_DIR ]];then
+    exec_dir $BUILD_DIR
+  else
+    exec_dir $ROOT
+  fi
 else
   EXT=${VIM_FILEPATH##*.}
   if [[ "$EXT" == "cpp" ]] || [[ "$EXP" == "cc" ]];then

@@ -8,12 +8,20 @@
 lvim.builtin.alpha.dashboard.section.footer.val = {
   [[ LunarVIM Config BY all3n ]],
 }
+lvim.builtin.alpha.dashboard.section.header.val = {
+  [[ MY LVIM ]]
+}
 
+require('mvim.plugins.dashboard')
+
+-- https://github.com/folke/lazy.nvim#-migration-guide
 lvim.plugins = {
+  {'nathom/filetype.nvim', lazy = true,
+    event = "User FileOpened", config = true},
   {
     'skywind3000/asynctasks.vim',
     config = function()
-      require "plugins.async-tasks"
+      require "mvim.plugins.async-tasks"
     end
   },
   {
@@ -31,7 +39,7 @@ lvim.plugins = {
     cmd = "Copilot",
     event = "InsertEnter",
     config = function()
-      require("plugins.copilot")
+      require("mvim.plugins.copilot")
     end,
   },
   {
@@ -43,19 +51,95 @@ lvim.plugins = {
   {
     'fgheng/winbar.nvim',
     config = function()
-      require "plugins.winbar"
+      require "mvim.plugins.winbar"
     end
   },
-  'lourenci/github-colors',
-  'shaunsingh/nord.nvim',
+  -- 'lourenci/github-colors',
+  -- 'shaunsingh/nord.nvim',
   {
     "weilbith/nvim-code-action-menu",
     cmd = 'CodeActionMenu'
   },
-  'sainnhe/edge'
+  'sainnhe/edge',
+  { 'HiPhish/nvim-ts-rainbow2',      event = { "User FileOpened" } },
+  {
+    'phaazon/hop.nvim',
+    branch = 'v2',
+    config = function()
+      require('hop').setup { keys = "etovxqpdygfblzhckisuran" }
+      local hop = require('hop')
+      local directions = require('hop.hint').HintDirection
+      vim.keymap.set('', 'f', function()
+        hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true })
+      end, { remap = true })
+      vim.keymap.set('', 'F', function()
+        hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true })
+      end, { remap = true })
+      vim.keymap.set('', 't', function()
+        hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 })
+      end, { remap = true })
+      vim.keymap.set('', 'T', function()
+        hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
+      end, { remap = true })
+    end
+  },
+  {
+    'ggandor/leap.nvim',
+    config = function()
+      require('leap').add_default_mappings()
+    end
+  },
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    event = { "User FileOpened" },
+    config = function()
+      require 'treesitter-context'.setup {
+        enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
+        max_lines = 0,            -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0,    -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 20, -- Maximum number of lines to collapse for a single context line
+        trim_scope = 'outer',     -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = 'cursor',          -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20,     -- The Z-index of the context window
+        on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+      }
+    end
+  },
+  {
+    'ethanholz/nvim-lastplace',
+    config = function()
+      require 'nvim-lastplace'.setup {
+        lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
+        lastplace_ignore_filetype = { "gitcommit", "gitrebase", "svn", "hgcommit" },
+        lastplace_open_folds = true
+      }
+    end
+  },
+  {
+    'folke/persistence.nvim',
+    event = "BufReadPre",
+    config = function()
+      require("persistence").setup({
+        dir = vim.fn.expand(vim.fn.stdpath("cache") .. "/session/"),
+        options = { "buffers", "curdir", "tabpages", "winsize" },
+        pre_save = nil,
+      })
+
+    end
+  }
 }
+lvim.builtin.treesitter.rainbow.enable = true
 
 
+lvim.builtin.which_key.mappings["P"] = {
+  name = "+Persistence",
+  l = { "<cmd>lua require('persistence').load()<cr>", "Load Session" },
+  s = { "<cmd>lua require('persistence').stop()<cr>", "Stop Session" },
+}
 
 -- which key custom
 lvim.builtin.which_key.mappings["r"] = {
@@ -76,8 +160,16 @@ lvim.builtin.which_key.mappings.l.a = { "<cmd>CodeActionMenu<cr>", "Code Action"
 -- toggle group
 lvim.builtin.which_key.mappings["t"] = {
   name = "Toggle",
-  o = { "<cmd>SymbolsOutline<cr>", "SymbolsOutline" }
+  o = { "<cmd>SymbolsOutline<cr>", "SymbolsOutline" },
+  t = { "<cmd>ClangdSwitchSourceHeader<cr>", "Header/Source" }
 }
+
+lvim.builtin.which_key.mappings["h"] = {
+  name = "Hop",
+  w = { "<cmd>HopWord<cr>", "HopWord" },
+}
+
+
 -- nvim-tree
 lvim.builtin.nvimtree.setup.renderer.group_empty = true
 
@@ -97,7 +189,7 @@ vim.g.edge_better_performance = 1
 lvim.builtin.lualine.options.theme = 'edge'
 lvim.colorscheme = "edge"
 
-require("dap.init")
+require("mvim.dap")
 
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
