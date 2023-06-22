@@ -130,9 +130,43 @@ lvim.plugins = {
       })
 
     end
+  },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+
+    },config = function()
+      vim.keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>",
+        {silent = true, noremap = true}
+      )
+
+    end
+  },
+  {
+    "ThePrimeagen/harpoon",
+    lazy = true,
+    cmd = "Telescope harpoon marks",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+    },
+    config = function()
+        require("harpoon").setup({})
+        require("telescope").load_extension("harpoon")
+    end,
   }
 }
 lvim.builtin.treesitter.rainbow.enable = true
+
+lvim.builtin.which_key.mappings["x"] = {
+  name = "+Trouble",
+  x = { "<cmd>TroubleToggle<cr>", "TroubleToggle" },
+  w = { "<cmd>TroubleToggle workspace_diagnostics<cr>", "TroubleToggle workspace_diagnostics" },
+  d = { "<cmd>TroubleToggle document_diagnostics<cr>", "TroubleToggle document_diagnostics" },
+  l = { "<cmd>TroubleToggle loclist<cr>", "TroubleToggle loclist" },
+  q = { "<cmd>TroubleToggle quickfix<cr>", "TroubleToggle quickfix" },
+}
+
 
 
 lvim.builtin.which_key.mappings["P"] = {
@@ -190,6 +224,8 @@ lvim.builtin.lualine.options.theme = 'edge'
 lvim.colorscheme = "edge"
 
 require("mvim.dap")
+lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM"}
+
 
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
