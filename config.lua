@@ -14,10 +14,20 @@ lvim.builtin.alpha.dashboard.section.header.val = {
 
 require('mvim.plugins.dashboard')
 
+lvim.builtin.copilot = {
+  active = false
+}
+lvim.builtin.tabnine = {
+  active = true
+}
 -- https://github.com/folke/lazy.nvim#-migration-guide
 lvim.plugins = {
-  {'nathom/filetype.nvim', lazy = true,
-    event = "User FileOpened", config = true},
+  {
+    'nathom/filetype.nvim',
+    lazy = true,
+    event = "User FileOpened",
+    config = true
+  },
   {
     'skywind3000/asynctasks.vim',
     config = function()
@@ -41,11 +51,29 @@ lvim.plugins = {
     config = function()
       require("mvim.plugins.copilot")
     end,
+    enabled = lvim.builtin.copilot.active
   },
   {
     "zbirenbaum/copilot-cmp",
     dependencies = { "copilot.lua" },
-    config = true
+    config = true,
+    enabled = lvim.builtin.copilot.active
+  },
+  {
+    "codota/tabnine-nvim",
+    build = "./dl_binaries.sh",
+    enabled = lvim.builtin.tabnine.active,
+    config = function()
+      require('tabnine').setup({
+        disable_auto_comment = true,
+        accept_keymap = "<Tab>",
+        dismiss_keymap = "<C-]>",
+        debounce_ms = 800,
+        suggestion_color = { gui = "#808080", cterm = 244 },
+        exclude_filetypes = { "TelescopePrompt" },
+        log_file_path = nil, -- absolute path to Tabnine log file
+      })
+    end
   },
   { "simrat39/symbols-outline.nvim", config = true },
   {
@@ -128,7 +156,6 @@ lvim.plugins = {
         options = { "buffers", "curdir", "tabpages", "winsize" },
         pre_save = nil,
       })
-
     end
   },
   {
@@ -136,11 +163,11 @@ lvim.plugins = {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
 
-    },config = function()
+    },
+    config = function()
       vim.keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>",
-        {silent = true, noremap = true}
+        { silent = true, noremap = true }
       )
-
     end
   },
   {
@@ -148,12 +175,18 @@ lvim.plugins = {
     lazy = true,
     cmd = "Telescope harpoon marks",
     dependencies = {
-        "nvim-lua/plenary.nvim",
+      "nvim-lua/plenary.nvim",
     },
     config = function()
-        require("harpoon").setup({})
-        require("telescope").load_extension("harpoon")
+      require("harpoon").setup({})
+      require("telescope").load_extension("harpoon")
     end,
+  },
+  {
+    "KabbAmine/zeavim.vim",
+    config = function()
+      vim.g.zv_zeal_executable = "/usr/bin/zeal"
+    end
   }
 }
 lvim.builtin.treesitter.rainbow.enable = true
@@ -217,15 +250,36 @@ local keymap = vim.api.nvim_set_keymap
 keymap("n", "<S-l>", ":bnext<CR>", opts)
 keymap("n", "<S-h>", ":bprevious<CR>", opts)
 
+-- default define in ~/.local/share/lunarvim/lvim/lua/lvim/config/settings.lua
 vim.g.edge_style = 'aura'
 vim.g.edge_better_performance = 1
+vim.opt.cursorcolumn = true
 
 lvim.builtin.lualine.options.theme = 'edge'
 lvim.colorscheme = "edge"
 
 require("mvim.dap")
-lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM"}
+lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM" }
 
 
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
+
+
+
+vim.cmd([[
+
+" press <Tab> to expand or jump in a snippet. These can also be mapped separately
+" via <Plug>luasnip-expand-snippet and <Plug>luasnip-jump-next.
+imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
+" -1 for jumping backwards.
+inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>
+
+snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>
+snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
+
+" For changing choices in choiceNodes (not strictly necessary for a basic setup).
+imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+
+]])
