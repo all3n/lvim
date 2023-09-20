@@ -5,9 +5,8 @@ if [[ -f $C_ENV ]];then
   . $C_ENV
 fi
 SCRIPT=$1
-echo $CFLAGS
 : ${CFLAGS:=$(cat $SCRIPT | grep '// CFLAGS:' | awk -F: '{print $2}')}
-LIBS=$(cat $SCRIPT | grep '// LIBS:' | awk -F: '{print $2}')
+: ${LIBS:=$(cat $SCRIPT | grep '// LIBS:' | awk -F: '{print $2}')}
 if [[ -z "$SOURCES" ]];then
   SOURCES=$(cat $SCRIPT | grep '// SOURCES:' | awk -F: '{print $2}')
 else
@@ -36,7 +35,7 @@ else
   TMP_OUTPUT=$BUILD_RIR/$NAME
   DELETE=0
 fi
-CMD="$GCC -g $CFLAGS -o $TMP_OUTPUT $@ $SOURCES $LIBS"
+CMD="$GCC -g $CFLAGS -o $TMP_OUTPUT $@ $SOURCES ${LDFLAGS} $LIBS"
 echo $CMD
 echo "--------------------------------------------------------"
 $CMD

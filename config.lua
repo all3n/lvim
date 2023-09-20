@@ -14,10 +14,20 @@ lvim.builtin.alpha.dashboard.section.header.val = {
 
 require('mvim.plugins.dashboard')
 
+lvim.builtin.copilot = {
+  active = false
+}
+lvim.builtin.tabnine = {
+  active = true
+}
 -- https://github.com/folke/lazy.nvim#-migration-guide
 lvim.plugins = {
-  {'nathom/filetype.nvim', lazy = true,
-    event = "User FileOpened", config = true},
+  {
+    'nathom/filetype.nvim',
+    lazy = true,
+    event = "User FileOpened",
+    config = true
+  },
   {
     'skywind3000/asynctasks.vim',
     config = function()
@@ -41,11 +51,29 @@ lvim.plugins = {
     config = function()
       require("mvim.plugins.copilot")
     end,
+    enabled = lvim.builtin.copilot.active
   },
   {
     "zbirenbaum/copilot-cmp",
     dependencies = { "copilot.lua" },
-    config = true
+    config = true,
+    enabled = lvim.builtin.copilot.active
+  },
+  {
+    "codota/tabnine-nvim",
+    build = "./dl_binaries.sh",
+    enabled = lvim.builtin.tabnine.active,
+    config = function()
+      require('tabnine').setup({
+        disable_auto_comment = true,
+        accept_keymap = "<C-y>",
+        dismiss_keymap = "<C-n>",
+        debounce_ms = 800,
+        suggestion_color = { gui = "#808080", cterm = 244 },
+        exclude_filetypes = { "TelescopePrompt" },
+        log_file_path = nil, -- absolute path to Tabnine log file
+      })
+    end
   },
   { "simrat39/symbols-outline.nvim", config = true },
   {
@@ -128,7 +156,6 @@ lvim.plugins = {
         options = { "buffers", "curdir", "tabpages", "winsize" },
         pre_save = nil,
       })
-
     end
   },
   {
@@ -136,11 +163,11 @@ lvim.plugins = {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
 
-    },config = function()
+    },
+    config = function()
       vim.keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>",
-        {silent = true, noremap = true}
+        { silent = true, noremap = true }
       )
-
     end
   },
   {
@@ -148,61 +175,37 @@ lvim.plugins = {
     lazy = true,
     cmd = "Telescope harpoon marks",
     dependencies = {
-        "nvim-lua/plenary.nvim",
+      "nvim-lua/plenary.nvim",
     },
     config = function()
-        require("harpoon").setup({})
-        require("telescope").load_extension("harpoon")
+      require("harpoon").setup({})
+      require("telescope").load_extension("harpoon")
     end,
+  },
+  {
+    "chipsenkbeil/distant.nvim",
+    -- config = function()
+    --   require('distant').setup {
+    --     ['*'] = require('distant.settings').chip_default()
+    --   }
+    -- end
+  },
+  {
+    "jamestthompson3/nvim-remote-containers",
+    config = function()
+    end
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    config = function()
+      require("mvim.plugins.nvim-treesitter-textobjects")
+    end
   }
 }
+
+require("mvim.plugins.which-key")
+
 lvim.builtin.treesitter.rainbow.enable = true
-
-lvim.builtin.which_key.mappings["x"] = {
-  name = "+Trouble",
-  x = { "<cmd>TroubleToggle<cr>", "TroubleToggle" },
-  w = { "<cmd>TroubleToggle workspace_diagnostics<cr>", "TroubleToggle workspace_diagnostics" },
-  d = { "<cmd>TroubleToggle document_diagnostics<cr>", "TroubleToggle document_diagnostics" },
-  l = { "<cmd>TroubleToggle loclist<cr>", "TroubleToggle loclist" },
-  q = { "<cmd>TroubleToggle quickfix<cr>", "TroubleToggle quickfix" },
-}
-
-
-
-lvim.builtin.which_key.mappings["P"] = {
-  name = "+Persistence",
-  l = { "<cmd>lua require('persistence').load()<cr>", "Load Session" },
-  s = { "<cmd>lua require('persistence').stop()<cr>", "Stop Session" },
-}
-
--- which key custom
-lvim.builtin.which_key.mappings["r"] = {
-  name = "+Run",
-  l = { "<cmd>AsyncTaskList<cr>", "AsyncTaskList" },
-  P = { "<cmd>AsyncTaskProfile<cr>", "AsyncTaskProfile" },
-  m = { "<cmd>AsyncTaskMacro<cr>", "AsyncTaskMacro" },
-  b = { "<cmd>AsyncTask file-build<cr>", "task:build" },
-  r = { "<cmd>AsyncTask file-run<cr>", "task:run" },
-  p = {
-    "+Project",
-    b = { "<cmd>AsyncTask project-build<cr>", "task:project:build" },
-    r = { "<cmd>AsyncTask project-run<cr>", "task:project:run" },
-  }
-}
-
-lvim.builtin.which_key.mappings.l.a = { "<cmd>CodeActionMenu<cr>", "Code Action" }
--- toggle group
-lvim.builtin.which_key.mappings["t"] = {
-  name = "Toggle",
-  o = { "<cmd>SymbolsOutline<cr>", "SymbolsOutline" },
-  t = { "<cmd>ClangdSwitchSourceHeader<cr>", "Header/Source" }
-}
-
-lvim.builtin.which_key.mappings["h"] = {
-  name = "Hop",
-  w = { "<cmd>HopWord<cr>", "HopWord" },
-}
-
 
 -- nvim-tree
 lvim.builtin.nvimtree.setup.renderer.group_empty = true
@@ -214,18 +217,48 @@ lvim.builtin.terminal.execs = {
 -- keymap custom
 local opts = { noremap = true, silent = true }
 local keymap = vim.api.nvim_set_keymap
+-- normal mode
 keymap("n", "<S-l>", ":bnext<CR>", opts)
 keymap("n", "<S-h>", ":bprevious<CR>", opts)
+-- visual block mode
+keymap("x", "x", "x", opts)
 
+-- default define in ~/.local/share/lunarvim/lvim/lua/lvim/config/settings.lua
 vim.g.edge_style = 'aura'
 vim.g.edge_better_performance = 1
+vim.opt.cursorcolumn = true
 
 lvim.builtin.lualine.options.theme = 'edge'
 lvim.colorscheme = "edge"
 
-require("mvim.dap")
-lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM"}
+require("mvim.dap").init()
+lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM" }
 
 
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
+
+lvim.builtin.lualine.sections.lualine_c = {"require('mvim.dap').selected_config"}
+-- lvim.builtin.lualine.on_config_done = function(lualine)
+--   print("123")
+--   print(lualine)
+--   -- lualine.sections.lualine_c = { "os.date('%a')" }
+-- end
+
+vim.cmd([[
+
+" press <Tab> to expand or jump in a snippet. These can also be mapped separately
+" via <Plug>luasnip-expand-snippet and <Plug>luasnip-jump-next.
+imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
+" -1 for jumping backwards.
+inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>
+
+snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>
+snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
+
+" For changing choices in choiceNodes (not strictly necessary for a basic setup).
+imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+
+
+]])
