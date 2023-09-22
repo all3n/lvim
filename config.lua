@@ -183,24 +183,29 @@ lvim.plugins = {
     end,
   },
   {
-    "chipsenkbeil/distant.nvim",
-    -- config = function()
-    --   require('distant').setup {
-    --     ['*'] = require('distant.settings').chip_default()
-    --   }
-    -- end
-  },
-  {
-    "jamestthompson3/nvim-remote-containers",
+    'rcarriga/nvim-notify',
     config = function()
+      vim.notify = require("notify")
     end
   },
   {
-    "nvim-treesitter/nvim-treesitter-textobjects",
+    "sainnhe/everforest"
+  },
+  {
+    "lourenci/github-colors"
+  },
+  {
+    'all3n/vs-tasks.nvim',
+    dependencies = {
+      'nvim-lua/popup.nvim',
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim'
+    },
     config = function()
-      require("mvim.plugins.nvim-treesitter-textobjects")
+      require("mvim.plugins.vstask").init()
     end
   }
+
 }
 
 require("mvim.plugins.which-key")
@@ -226,10 +231,10 @@ keymap("x", "x", "x", opts)
 -- default define in ~/.local/share/lunarvim/lvim/lua/lvim/config/settings.lua
 vim.g.edge_style = 'aura'
 vim.g.edge_better_performance = 1
-vim.opt.cursorcolumn = true
+vim.opt.cursorcolumn = false
 
 lvim.builtin.lualine.options.theme = 'edge'
-lvim.colorscheme = "edge"
+lvim.colorscheme = "everforest"
 
 require("mvim.dap").init()
 lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM" }
@@ -238,12 +243,11 @@ lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM" }
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
 
-lvim.builtin.lualine.sections.lualine_c = {"require('mvim.dap').selected_config"}
--- lvim.builtin.lualine.on_config_done = function(lualine)
---   print("123")
---   print(lualine)
---   -- lualine.sections.lualine_c = { "os.date('%a')" }
--- end
+
+lvim.builtin.lualine.sections.lualine_c = { 
+  "require('mvim.dap').dap_status()",
+  "require('mvim.plugins.vstask').status()"
+}
 
 vim.cmd([[
 
@@ -259,6 +263,5 @@ snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
 " For changing choices in choiceNodes (not strictly necessary for a basic setup).
 imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
 smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
-
 
 ]])

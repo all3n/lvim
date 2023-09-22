@@ -1,4 +1,3 @@
-
 lvim.builtin.which_key.vmappings["<space>"] = {
   "<Plug>(comment_toggle_linewise_visual)",
   "Comment Visual"
@@ -53,8 +52,34 @@ lvim.builtin.which_key.mappings["h"] = {
   w = { "<cmd>HopWord<cr>", "HopWord" },
 }
 lvim.builtin.which_key.mappings["d"].y = {
-   "<cmd>lua require('mvim.dap').choose_config()<cr>", "ChooseConfiguration" 
+  "<cmd>lua require('mvim.dap').choose_config()<cr>", "ChooseConfiguration"
+}
+lvim.builtin.which_key.mappings["d"].R = {
+  "<cmd>lua require('mvim.dap').run()<cr>", "RUN"
 }
 
 
+lvim.builtin.which_key.mappings["s"].n = {
+  "<cmd>Telescope notify<cr>", "NotifyHistory"
+}
 
+lvim.builtin.which_key.mappings["v"] = {
+  name = "VsCode",
+  t = { "<cmd>lua require('telescope').extensions.vstask.tasks()<cr>",
+    "Tasks" },
+  i = { "<cmd>lua require('telescope').extensions.vstask.input()<cr>",
+    "input" },
+  h = { "<cmd>lua require('telescope').extensions.vstask.history()<cr>",
+    "History" },
+  l = { "<cmd>lua require('telescope').extensions.vstask.launch()<cr>",
+    "Launch" },
+  v = {
+    "<cmd>lua require('mvim.plugins.vstask').run_last()<cr>", "last task" },
+  d = {
+    "<cmd>lua require('mvim.func').view_vars()<cr>", "dump_vars" },
+}
+vim.api.nvim_set_keymap('n', '<F5>', '<cmd>lua require("mvim.plugins.vstask").run_last()<CR>', { noremap = true, silent = true })
+
+lvim.builtin.which_key.mappings["m"] = {
+  "<cmd>lua require('telescope').extensions.vstask.tasks()<cr>", "VsTasks"
+}
