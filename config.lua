@@ -243,10 +243,12 @@ lvim.builtin.nvimtree.setup.filters.custom = { "node_modules", "*.o", "*.dSYM" }
 -- lsp
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "clangd" })
 
-
-lvim.builtin.lualine.sections.lualine_c = { 
+lvim.builtin.lualine.sections.lualine_c = {
   "require('mvim.dap').dap_status()",
   "require('mvim.plugins.vstask').status()"
+}
+lvim.builtin.lualine.sections.lualine_x = {
+  "require('mvim.func').toggleterm_status()"
 }
 
 vim.cmd([[
