@@ -5,6 +5,7 @@ M.selected_config = "-"
 M.dap_json = {}
 M.launch_type = nil
 lvim.builtin.dap.ui.auto_open = false
+local vp = require("vstask.Parse")
 local project_dir = vim.fn.getcwd()
 local vscode_launch_json_path = project_dir .. '/.vscode/launch.json'
 local nvim_launch_json_path = project_dir .. '/.nvim/launch.json'
@@ -72,13 +73,12 @@ function M.read_config()
     if launch_json_data.configurations then
       M.launchConfigMap = {}
       M.keys = {}
-      -- 遍历每个配置
       for _, config in ipairs(launch_json_data.configurations) do
         if config.name and config.program and config.args then
-          -- M.launchConfigMap[config.name] = {
-          --   command = config.program,
-          --   args = config.args
-          -- }
+          config.program = vp.replace(config.program)
+          for idx, arg in ipairs(config.args) do
+            config.args[idx] = vp.replace(arg)
+          end
           M.launchConfigMap[config.name] = config
           table.insert(M.keys, config.name)
         end
@@ -113,37 +113,39 @@ function M.get_cpp_config()
     type = "codelldb",
     request = "launch",
     program = function()
+      local cmd = nil
       if M.launchConfigMap then
         if M.selected_config then
-          return M.launchConfigMap[M.selected_config].program
+          cmd = M.launchConfigMap[M.selected_config].program
         else
           M.choose_config()
           if M.selected_config then
-            return M.launchConfigMap[M.selected_config].program
+            cmd = M.launchConfigMap[M.selected_config].program
           else
-            return "${workspaceFolder}/${fileBasenameNoExtension}"
+            cmd = "${workspaceFolder}/${fileBasenameNoExtension}"
           end
         end
       else
         vim.notify("No configuration")
-        return "${workspaceFolder}/${fileBasenameNoExtension}"
+        cmd = "${workspaceFolder}/${fileBasenameNoExtension}"
       end
+      vim.notify("cmd:" .. cmd)
+      return cmd
     end,
     args = function()
+      local args = {}
       if M.launchConfigMap then
         if M.selected_config then
-          return M.launchConfigMap[M.selected_config].args
+          args = M.launchConfigMap[M.selected_config].args
         else
           M.choose_config()
           if M.selected_config then
-            return M.launchConfigMap[M.selected_config].args
-          else
-            return {}
+            args = M.launchConfigMap[M.selected_config].args
           end
         end
-      else
-        return {}
       end
+      vim.notify("args:" .. vim.inspect(args))
+      return args
     end,
     cwd = '${workspaceFolder}',
     stopOnEntry = false,

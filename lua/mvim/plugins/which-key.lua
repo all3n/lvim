@@ -62,6 +62,15 @@ lvim.builtin.which_key.mappings["d"].R = {
 lvim.builtin.which_key.mappings["s"].n = {
   "<cmd>Telescope notify<cr>", "NotifyHistory"
 }
+lvim.builtin.which_key.mappings["s"].s = {
+  "<cmd>Telescope lsp_document_symbols<cr>", "DocumentSymbols"
+}
+lvim.builtin.which_key.mappings["s"].w = {
+  "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", "WorkspaceSymbols"
+}
+
+
+
 
 lvim.builtin.which_key.mappings["v"] = {
   name = "VsCode",
