@@ -1,0 +1,9 @@
+[tool.pyright]
+include = ["python"]
+exclude = [
+    "**/__pycache__"
+]
+defineConstant = { DEBUG = true }
+venv = "venv"
+venvPath = "."
+reportGeneralTypeIssues = "none"

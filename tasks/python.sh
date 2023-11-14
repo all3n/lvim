@@ -1,18 +1,20 @@
 . $LUNARVIM_CONFIG_DIR/bin/task-init.sh
 
 SCRIPT=$1
-CWD_VENV=$VIM_CWD/venv
-if [[ -d $CWD_VENV ]];then
-    echo "activate venv $CWD_VENV"
-    . $CWD_VENV/bin/activate
-    TASK_PYTHON=$(which python)
-fi
-if [[ -f $TASK_PYTHON ]];then
-    PYTHON=$TASK_PYTHON
-else
-    PYTHON=$(which python)
+
+if [[ -z "$PYTHON" ]];then
+  CWD_VENV=$WORKSPACE/venv
+  if [[ -d $CWD_VENV ]];then
+      . $CWD_VENV/bin/activate
+      TASK_PYTHON=$(which python)
+  fi
+  if [[ -f $TASK_PYTHON ]];then
+      PYTHON=$TASK_PYTHON
+  else
+      PYTHON=$(which python)
+  fi
 fi
 
-echo "PYTHON: $PYTHON"
+echo "PYTHON: $PYTHON $@"
 
-$PYTHON $@
+$PYTHON $@ $RUN_ARGS

@@ -1,24 +1,13 @@
 . $LUNARVIM_CONFIG_DIR/bin/task-init.sh
-
-C_ENV=$VIM_FILEDIR/.c_env.sh
-if [[ -f $C_ENV ]];then
-  . $C_ENV
-fi
 SCRIPT=$1
-: ${CFLAGS:=$(cat $SCRIPT | grep '// CFLAGS:' | awk -F: '{print $2}')}
-: ${LIBS:=$(cat $SCRIPT | grep '// LIBS:' | awk -F: '{print $2}')}
-if [[ -z "$SOURCES" ]];then
-  SOURCES=$(cat $SCRIPT | grep '// SOURCES:' | awk -F: '{print $2}')
-else
-  SOURCES=""
-fi
-BUILD_RIR=$(cat $SCRIPT | grep '// BUILD_DIR:' | awk -F: '{print $2}')
 
-if [[ -f $TASK_GCC ]];then
-    : ${GCC:=$TASK_GCC}
-else
-    : ${GCC:=$(which gcc)}
-fi
+: ${CC:=$(which gcc)}
+for line in $(cat $SCRIPT|grep -E "//\s*@ENV"|awk -F: '{print $2}');do 
+  KEY=$(echo $line|awk -F= '{print $1}')
+  VALUE=$(echo $line|awk '{print substr($0, index($0, "=") + 1)}')
+  eval "export $KEY=$VALUE"
+done
+
 
 if [[ -z $ROOT ]];then
   cd $VIM_FILEDIR
@@ -35,7 +24,7 @@ else
   TMP_OUTPUT=$BUILD_RIR/$NAME
   DELETE=0
 fi
-CMD="$GCC -g $CFLAGS -o $TMP_OUTPUT $@ $SOURCES ${LDFLAGS} $LIBS"
+CMD="$CC -g $CFLAGS -o $TMP_OUTPUT $@ $SOURCES ${LDFLAGS} $LIBS"
 echo $CMD
 echo "--------------------------------------------------------"
 $CMD

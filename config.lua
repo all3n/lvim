@@ -89,7 +89,7 @@ lvim.plugins = {
     cmd = 'CodeActionMenu'
   },
   'sainnhe/edge',
-  { 'HiPhish/nvim-ts-rainbow2',      event = { "User FileOpened" } },
+  -- { 'HiPhish/nvim-ts-rainbow2',      event = { "User FileOpened" } },
   {
     'phaazon/hop.nvim',
     branch = 'v2',
